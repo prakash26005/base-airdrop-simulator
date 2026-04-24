@@ -466,33 +466,63 @@ function castToFarcaster() { ... }
         </div>
 
 <script>
+// === FIXED CAST FUNCTION - Button screenshot mein nahi aayega ===
 async function castToFarcaster() {
-  // Score ka screenshot leke download
+  const scoreArea = document.querySelector('.score-block');
+  if (!scoreArea) {
+    alert("Pehle Score tab kholo!");
+    return;
+  }
+
   try {
-    const resultsArea = document.querySelector('.m3')?.parentElement || document.body;
-    const canvas = await html2canvas(resultsArea, {
+    const btn = document.querySelector('button[onclick*="castToFarcaster"]');
+    if (btn) btn.disabled = true;
+
+    // Screenshot lo (score-block sirf)
+    const canvas = await html2canvas(scoreArea, {
+      scale: 2,
       backgroundColor: '#06080f',
-      scale: 2
+      logging: false
     });
-    const link = document.createElement('a');
-    link.download = 'my-base-airdrop-score.png';
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-  } catch(e) {}
 
-  // Warpcast compose kholo (English text)
-  const tokens = document.getElementById('m-tok')?.innerText || '6.3K';
-  const tier   = document.getElementById('m-tier')?.innerText || 'Gold';
-  const usd    = document.getElementById('m-usd')?.innerText || '$625';
+    // Canvas ko blob banao
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
 
-  const castText = encodeURIComponent(
-    `🔥 I just scored ${tokens} BASE (${tier} tier) ≈ ${usd} in Base Airdrop Simulator!\n\n` +
-    `What's your score? Check it out 👇\n\n` +
-    `Made by @8q • Base Airdrop Farmer\n` +
-    `https://prakash26005.github.io/base-airdrop-simulator/`
-  );
+    // 0x0.st pe upload (free image host)
+    const formData = new FormData();
+    formData.append('file', blob, 'base-airdrop-score.png');
 
-  window.open(`https://warpcast.com/~/compose?text=${castText}`, '_blank');
+    const uploadRes = await fetch('https://0x0.st', {
+      method: 'POST',
+      body: formData
+    });
+
+    if (!uploadRes.ok) throw new Error("Upload failed");
+
+    const imageUrl = (await uploadRes.text()).trim();
+
+    // Score details
+    const tokens = document.getElementById('m-tok')?.innerText || '6.3K';
+    const tier   = document.getElementById('m-tier')?.innerText || 'Gold';
+    const usd    = document.getElementById('m-usd')?.innerText || '$625';
+
+    const castText = encodeURIComponent(
+      `🔥 Base Airdrop Simulator mein mera score: ${tokens} BASE (${tier} tier) ≈ ${usd}!\n\n` +
+      `Tumhara kitna aayega? Check karo 👇\n\n` +
+      `Made by @8q • Base Airdrop Farmer\n` +
+      `https://prakash26005.github.io/base-airdrop-simulator/\n\n` +
+      `${imageUrl}`
+    );
+
+    window.open(`https://warpcast.com/~/compose?text=${castText}`, '_blank');
+
+  } catch (err) {
+    alert("Screenshot upload mein error: " + err.message + "\n\nAbhi manual attach kar sakte ho.");
+    console.error(err);
+  } finally {
+    const btn = document.querySelector('button[onclick*="castToFarcaster"]');
+    if (btn) btn.disabled = false;
+  }
 }
 </script>
     <!-- SETTINGS -->
