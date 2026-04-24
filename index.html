@@ -360,6 +360,7 @@ footer{
 }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@farcaster/miniapp-sdk@latest/dist/index.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
   <div style="background:#000;color:#fff;padding:15px 10px;text-align:center;font-size:18px;font-weight:700;">
@@ -467,7 +468,44 @@ function castToFarcaster() {
         </div>
       </div>
     </div>
+        <!-- === CAST ON FARCASTER BUTTON + SCREENSHOT === -->
+        <div style="text-align:center; margin:25px 0 15px;">
+          <button onclick="castToFarcaster()" 
+                  style="background:linear-gradient(90deg,#0052ff,#00d4aa); color:#fff; border:none; padding:14px 32px; font-size:17px; font-weight:700; border-radius:9999px; cursor:pointer; box-shadow:0 4px 15px rgba(0,212,170,.3); width:100%; max-width:320px;">
+            🚀 Cast on Farcaster & Tag @8q
+          </button>
+        </div>
 
+<script>
+async function castToFarcaster() {
+  // Score ka screenshot leke download
+  try {
+    const resultsArea = document.querySelector('.m3')?.parentElement || document.body;
+    const canvas = await html2canvas(resultsArea, {
+      backgroundColor: '#06080f',
+      scale: 2
+    });
+    const link = document.createElement('a');
+    link.download = 'my-base-airdrop-score.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  } catch(e) {}
+
+  // Warpcast compose kholo (English text)
+  const tokens = document.getElementById('m-tok')?.innerText || '6.3K';
+  const tier   = document.getElementById('m-tier')?.innerText || 'Gold';
+  const usd    = document.getElementById('m-usd')?.innerText || '$625';
+
+  const castText = encodeURIComponent(
+    `🔥 I just scored ${tokens} BASE (${tier} tier) ≈ ${usd} in Base Airdrop Simulator!\n\n` +
+    `What's your score? Check it out 👇\n\n` +
+    `Made by @8q • Base Airdrop Farmer\n` +
+    `https://prakash26005.github.io/base-airdrop-simulator/`
+  );
+
+  window.open(`https://warpcast.com/~/compose?text=${castText}`, '_blank');
+}
+</script>
     <!-- SETTINGS -->
     <div id="pane-settings" class="pane">
       <div class="scard">
