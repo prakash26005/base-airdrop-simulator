@@ -458,6 +458,58 @@ footer{
             🚀 Cast on Farcaster & Tag @8q
           </button>
         </div>
+                  </div>
+
+        <!-- 🔥 NFT MINT BUTTON YAHAN PASTE KARO -->
+        <div style="text-align:center; margin:25px 0 15px;">
+          <button onclick="mintScoreAsNFT()" 
+                  style="background:linear-gradient(90deg,#0052ff,#00d4aa); color:#fff; border:none; padding:14px 32px; font-size:17px; font-weight:700; border-radius:9999px; cursor:pointer; box-shadow:0 4px 15px rgba(0,212,170,.3); width:100%; max-width:320px;">
+            🪙 Mint My Score as NFT – Only $0.77
+          </button>
+          <p style="margin-top:8px; font-size:13px; color:#00d4aa;">
+            0.00033 ETH • Direct to your wallet
+          </p>
+        </div>
+
+<script>
+// === NFT MINT FUNCTION ===
+async function mintScoreAsNFT() {
+  if (typeof ethers === "undefined") {
+    alert("Ethers.js load nahi ho raha. Page reload karke try karo.");
+    return;
+  }
+  if (!window.ethereum) {
+    alert("MetaMask install ya open karo!");
+    return;
+  }
+  try {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    await provider.send("eth_requestAccounts", []);
+    const signer = provider.getSigner();
+    const userAddress = await signer.getAddress();
+
+    const contractAddress = "0x05f68B8741b56508dBc696272BAd25D7cA0F8665";
+    const abi = ["function mint(address to) payable"];
+
+    const contract = new ethers.Contract(contractAddress, abi, signer);
+
+    const tx = await contract.mint(userAddress, {
+      value: ethers.utils.parseEther("0.00033")
+    });
+
+    alert("⏳ Minting chal rahi hai...\nTx Hash: " + tx.hash);
+
+    await tx.wait(1);
+
+    alert("🎉 NFT Mint ho gaya!\nRevenue tere wallet mein aa gaya!");
+
+  } catch (err) {
+    console.error(err);
+    if (err.code === 4001) alert("Transaction cancel kar diya.");
+    else alert("Error: " + (err.message || err));
+  }
+}
+</script>
           <!-- === NFT MINT BUTTON (Score ke neeche) === -->
 <div style="text-align:center; margin:30px 0 20px;">
   <button onclick="mintScoreAsNFT()" 
