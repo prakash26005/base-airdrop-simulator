@@ -437,6 +437,30 @@ footer{
           <div class="bar-lbls"><span>0</span><span>3 (min)</span><span>7</span><span>12+</span><span>15</span></div>
         </div>
         <div class="m3">
+                  <!-- === CAST ON FARCASTER BUTTON === -->
+        <div style="text-align:center; margin:25px 0 15px;">
+          <button onclick="castToFarcaster()" 
+                  style="background:linear-gradient(90deg,#0052ff,#00d4aa); color:#fff; border:none; padding:14px 32px; font-size:17px; font-weight:700; border-radius:9999px; cursor:pointer; box-shadow:0 4px 15px rgba(0,212,170,.3); width:100%; max-width:320px;">
+            🚀 Cast on Farcaster & Tag @8q
+          </button>
+        </div>
+
+<script>
+function castToFarcaster() {
+  const tokens = document.getElementById('m-tok')?.innerText || '—';
+  const tier   = document.getElementById('m-tier')?.innerText || '—';
+  const usd    = document.getElementById('m-usd')?.innerText || '—';
+  
+  const castText = encodeURIComponent(
+    `🔥 Base Airdrop Simulator mein mera score: ${tokens} BASE (${tier} tier) ≈ $${usd}!\n\n` +
+    `Tumhara kitna aayega? Check karo 👇\n\n` +
+    `Made by @8q • Base Airdrop Farmer\n` +
+    `https://prakash26005.github.io/base-airdrop-simulator/`
+  );
+  
+  window.open(`https://warpcast.com/~/compose?text=${castText}`, '_blank');
+}
+</script>
           <div class="mbox"><div class="ml">Est. Tokens</div><div class="mv" id="m-tok">—</div><div class="ms">BASE</div></div>
           <div class="mbox"><div class="ml">Tier</div><div class="mv" id="m-tier">—</div><div class="ms">level</div></div>
           <div class="mbox"><div class="ml">USD Value</div><div class="mv" id="m-usd">—</div><div class="ms" id="m-sub">FDV $1B · 5%</div></div>
