@@ -4,7 +4,11 @@
 <meta charset="UTF-8">
 <title>Savver Base Airdrop Simulator • @8q</title>
 <meta name="description" content="Base Airdrop Simulator - Made by @8q">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<head>
+  ... purana code ...
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+</head>
+  
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -446,22 +450,7 @@ footer{
           </button>
         </div>
 
-<script>
-function castToFarcaster() {
-  const tokens = document.getElementById('m-tok')?.innerText || '—';
-  const tier   = document.getElementById('m-tier')?.innerText || '—';
-  const usd    = document.getElementById('m-usd')?.innerText || '—';
-  
-  const castText = encodeURIComponent(
-    `🔥 Base Airdrop Simulator mein mera score: ${tokens} BASE (${tier} tier) ≈ $${usd}!\n\n` +
-    `Tumhara kitna aayega? Check karo 👇\n\n` +
-    `Made by @8q • Base Airdrop Farmer\n` +
-    `https://prakash26005.github.io/base-airdrop-simulator/`
-  );
-  
-  window.open(`https://warpcast.com/~/compose?text=${castText}`, '_blank');
-}
-</script>
+function castToFarcaster() { ... }
           <div class="mbox"><div class="ml">Est. Tokens</div><div class="mv" id="m-tok">—</div><div class="ms">BASE</div></div>
           <div class="mbox"><div class="ml">Tier</div><div class="mv" id="m-tier">—</div><div class="ms">level</div></div>
           <div class="mbox"><div class="ml">USD Value</div><div class="mv" id="m-usd">—</div><div class="ms" id="m-sub">FDV $1B · 5%</div></div>
