@@ -449,6 +449,61 @@ footer{
             🚀 Cast on Farcaster & Tag @8q
           </button>
         </div>
+          <!-- === NFT MINT BUTTON (Score ke neeche) === -->
+<div style="text-align:center; margin:30px 0 20px;">
+  <button onclick="mintScoreAsNFT()" 
+          style="background:linear-gradient(90deg,#0052ff,#00d4aa); color:#fff; border:none; padding:16px 40px; font-size:18px; font-weight:700; border-radius:9999px; cursor:pointer; box-shadow:0 6px 20px rgba(0,212,170,.4); width:100%; max-width:340px;">
+    🪙 Mint My Score as NFT – Only $0.77
+  </button>
+  <p style="margin-top:10px; font-size:13px; color:#00d4aa;">0.00033 ETH • Direct to your wallet</p>
+</div>
+
+<script>
+// === NFT MINT FUNCTION ===
+async function mintScoreAsNFT() {
+  if (!window.ethereum) {
+    alert("MetaMask install karo!");
+    return;
+  }
+
+  try {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    await provider.send("eth_requestAccounts", []);
+    const signer = provider.getSigner();
+    const userAddress = await signer.getAddress();
+
+    const contractAddress = "0x05f68B8741b56508dBc696272BAd25D7cA0F8665"; // ← Tera address
+
+    const abi = ["function mint(address to) payable"]; // Simple mint function (payable)
+
+    const contract = new ethers.Contract(contractAddress, abi, signer);
+
+    // 0.00033 ETH = 330000000000000 gwei
+    const tx = await contract.mint(userAddress, {
+      value: ethers.utils.parseEther("0.00033")
+    });
+
+    alert("⏳ Minting in progress... Tx: " + tx.hash);
+
+    await tx.wait();
+
+    alert("✅ NFT Mint ho gaya!\n\nScore NFT ab tere wallet mein hai.\nRevenue direct tere wallet mein aaya!");
+
+    // Optional: Warpcast mein share karne ka option
+    if (confirm("Abhi Warpcast pe share karna hai?")) {
+      window.open("https://warpcast.com/~/compose?text=NFT%20mint%20kar%20liya!%20My%20Base%20Airdrop%20Score%20as%20NFT%20%F0%9F%AA%99", "_blank");
+    }
+
+  } catch (err) {
+    console.error(err);
+    if (err.code === 4001) {
+      alert("Transaction cancel kar diya.");
+    } else {
+      alert("Error: " + err.message);
+    }
+  }
+}
+</script>
 
 function castToFarcaster() { ... }
           <div class="mbox"><div class="ml">Est. Tokens</div><div class="mv" id="m-tok">—</div><div class="ms">BASE</div></div>
