@@ -359,6 +359,7 @@ footer{
   .hero-text h1{font-size:20px}
 }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@farcaster/miniapp-sdk@latest/dist/index.min.js"></script>
 </head>
 <body>
   <div style="background:#000;color:#fff;padding:15px 10px;text-align:center;font-size:18px;font-weight:700;">
@@ -1142,6 +1143,12 @@ function tabSwitch(name, btn) {
   if (name === 'settings') { renderSettingsUSD(); setTimeout(renderAllocChart, 80); }
   if (name === 'data' && ST.scored) renderDataTab(ST.scored.rawData || {}, ST.scored);
 }
+</script>
+  <script>
+  // Farcaster Mini App ready signal
+  if (window.farcaster && window.farcaster.sdk) {
+    window.farcaster.sdk.actions.ready();
+  }
 </script>
 </body>
 </html>
