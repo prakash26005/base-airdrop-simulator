@@ -2,178 +2,560 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Savver Base Airdrop Simulator • @8q</title>
-  <meta name="description" content="Base Airdrop Simulator - Made by @8q">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Base Airdrop Simulator</title>
   
-  <!-- Ethers.js -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
-  <!-- HTML2Canvas -->
+  <!-- Ethers.js hata diya gaya hai kyuki wallet connect/contract nhi chahiye -->
+  <!-- Chart.js aur HTML2Canvas rakha hai -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   
   <style>
-    /* === PURA STYLE (same as before) === */
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{
-      --base-blue:#0052ff;--base-blue2:#1a6bff;--base-blue3:#4d8fff;--base-blue-dark:#0038b8;
-      --bg:#06080f;--surface:rgba(255,255,255,.04);--surface2:rgba(255,255,255,.07);
-      --border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.15);--text:#ffffff;
-      --text2:rgba(255,255,255,.65);--text3:rgba(255,255,255,.35);
-      --teal:#00d4aa;--red:#ff5555;--amber:#ffb800;--r:14px;--r-sm:9px;
+    :root {
+      --bg-main: #0B0E14;
+      --bg-card: #151A22;
+      --primary: #0052FF;
+      --primary-hover: #0043D1;
+      --text-main: #FFFFFF;
+      --text-muted: #8A93A6;
+      --border-color: #2A3241;
     }
-    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
-    .hero{width:100%;height:220px;background:linear-gradient(180deg,rgba(6,8,15,.1) 0%,rgba(6,8,15,.85) 100%),url('https://i.imgur.com/8qBaseHero.jpg') center/cover no-repeat;display:flex;align-items:flex-end}
-    .hero-inner{max-width:900px;margin:0 auto;padding:0 24px 28px;display:flex;align-items:flex-end;gap:18px}
-    .base-logo-img{width:52px;height:52px;border-radius:12px;border:2px solid rgba(255,255,255,.2);box-shadow:0 0 24px rgba(0,82,255,.6)}
-    .hero-text h1{font-size:26px;font-weight:800;letter-spacing:-.5px;line-height:1.1}
-    .hero-text h1 em{color:#4d8fff;font-style:normal}
-    .spec-pill{margin-left:auto;padding:5px 13px;border-radius:20px;background:rgba(255,184,0,.1);color:#ffb800;border:1px solid rgba(255,184,0,.3);font-size:11px;font-weight:600}
 
-    .main{max-width:900px;margin:0 auto;padding:28px 20px 0}
-    .search-card{background:var(--surface);border:1px solid var(--border2);border-radius:14px;padding:20px;margin-bottom:20px}
-    .addr-input{flex:1;background:rgba(255,255,255,.05);border:1px solid var(--border2);border-radius:9px;padding:12px 16px;font-family:'Space Mono',monospace;font-size:13px}
-    .scan-btn{padding:12px 32px;background:#0052ff;color:#fff;border:none;border-radius:9px;font-weight:700;cursor:pointer;width:100%;max-width:320px}
-    
-    #results{display:none}
-    .addr-strip{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 18px;margin-bottom:18px;display:flex;align-items:center;gap:12px}
-    .score-block{background:var(--surface);border:1px solid var(--border2);border-radius:14px;padding:22px;margin-bottom:14px}
-    .pts-big{font-size:52px;font-weight:800;background:linear-gradient(135deg,#fff,#4d8fff);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-    .m3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-    .mbox{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:15px;text-align:center}
-    .mv{font-size:22px;font-weight:800}
-    
-    /* Cast & Mint Buttons */
-    .action-btns{margin:30px 0;text-align:center}
-    .action-btn{
-      background:linear-gradient(90deg,#0052ff,#00d4aa);color:#fff;border:none;
-      padding:16px 40px;font-size:18px;font-weight:700;border-radius:9999px;
-      cursor:pointer;box-shadow:0 6px 20px rgba(0,212,170,.4);margin:8px;
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem;
     }
-    .note{font-size:13px;color:#00d4aa;margin-top:8px}
+
+    .container {
+      width: 100%;
+      max-width: 800px;
+      background: var(--bg-card);
+      border-radius: 16px;
+      border: 1px solid var(--border-color);
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .header {
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .tab {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+
+    .tab.on {
+      background: var(--primary);
+      color: white;
+    }
+
+    .pane {
+      display: none;
+      padding: 2rem;
+    }
+
+    .pane.on {
+      display: block;
+    }
+
+    .input-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .input-group input, .input-group select {
+      width: 100%;
+      background: var(--bg-main);
+      border: 1px solid var(--border-color);
+      color: white;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      font-family: 'Space Mono', monospace;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    .input-group input:focus, .input-group select:focus {
+      border-color: var(--primary);
+    }
+
+    .btn-primary {
+      width: 100%;
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 1rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 1rem;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .result-box {
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background: var(--bg-main);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      text-align: center;
+      display: none;
+    }
+
+    .result-box.show {
+      display: block;
+    }
+
+    .token-amt {
+      font-family: 'Space Mono', monospace;
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .usd-val {
+      font-size: 1.25rem;
+      color: var(--text-muted);
+    }
+
+    .settings-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+
+    @media (max-width: 600px) {
+      .settings-grid { grid-template-columns: 1fr; }
+    }
+
+    .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .sbtn {
+      background: var(--bg-main);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.875rem;
+      transition: all 0.2s;
+    }
+
+    .sbtn.ab, .sbtn.at {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .chart-container {
+      width: 100%;
+      height: 300px;
+      margin-top: 2rem;
+    }
+
+    /* Naya CSS AI feature ke liye */
+    .btn-ai {
+      width: 100%;
+      background: linear-gradient(90deg, #7b2cbf, #c77dff);
+      color: white;
+      border: none;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      margin-top: 1rem;
+      display: none; /* Pehle hide rahega */
+    }
+    
+    .btn-ai:hover {
+      opacity: 0.9;
+    }
+    
+    .ai-response-box {
+      margin-top: 1rem;
+      padding: 1.5rem;
+      background: rgba(123, 44, 191, 0.1);
+      border: 1px solid rgba(199, 125, 255, 0.3);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: #e0b3ff;
+      text-align: left;
+      display: none;
+    }
+
+    .loader {
+      display: inline-block;
+      width: 1rem;
+      height: 1rem;
+      border: 2px solid #fff;
+      border-bottom-color: transparent;
+      border-radius: 50%;
+      animation: rotation 1s linear infinite;
+      margin-right: 0.5rem;
+      vertical-align: middle;
+    }
+
+    @keyframes rotation {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
 
-<div style="background:#000;color:#fff;padding:12px;text-align:center;font-size:17px;font-weight:700">
-  🚀 Made by @8q • Base Airdrop Farmer
-</div>
-
-<div class="hero">… (same hero as before) …</div>
-
-<div class="main">
-  <!-- Search card same as before -->
-  <div class="search-card">…</div>
-
-  <div id="status" class="status"></div>
-  <div id="steps" class="steps">…</div>
-
-  <div id="results">
-    <div class="addr-strip">…</div>
-
-    <div class="tabs">…</div>
-
-    <!-- SCORE PANE -->
-    <div id="pane-score" class="pane on">
-      <div class="crit-grid" id="crit-grid"></div>
-      <div id="pen-wrap"></div>
-      <div class="score-block">
-        <div class="pts-row">
-          <div><span class="pts-big" id="pts-big">0</span><span class="pts-den">/15 pts</span></div>
-          <div class="pts-info" id="pts-info"></div>
-        </div>
-        <div class="bar-track"><div class="bar-fill" id="pts-bar" style="width:0%"></div></div>
-      </div>
-
-      <div class="m3" id="m3"></div>
-
-      <!-- CAST BUTTON -->
-      <div class="action-btns">
-        <button onclick="castToFarcaster()" class="action-btn">
-          🚀 Cast on Farcaster & Tag @8q
-        </button>
-      </div>
-
-      <!-- NFT MINT BUTTON -->
-      <div class="action-btns">
-        <button onclick="mintScoreAsNFT()" class="action-btn">
-          🪙 Mint My Score as NFT – Only $0.77
-        </button>
-        <p class="note">0.00033 ETH • Direct to your wallet</p>
+  <div class="container">
+    <div class="header">
+      <h1>Base Airdrop Simulator</h1>
+      <div class="tabs">
+        <button class="tab on" onclick="tabSwitch('simulator', this)">Simulator</button>
+        <button class="tab" onclick="tabSwitch('settings', this)">Settings</button>
       </div>
     </div>
 
-    <!-- SETTINGS & DATA panes same as before -->
+    <!-- Simulator Pane -->
+    <div id="pane-simulator" class="pane on">
+      <p style="color: var(--text-muted); margin-bottom: 2rem; font-size: 0.9rem;">
+        // Ethers.js (wallet connect) aur contract interactions hata diye gaye hain.<br>
+        // Farcaster ka sirf ek hi input rakha gaya hai jaisa aapne kaha tha.
+      </p>
+
+      <div class="input-group">
+        <label>Total Bridge Volume (ETH mein)</label>
+        <input type="number" id="inp-bridge" placeholder="e.g. 0.5" step="0.01" min="0">
+      </div>
+
+      <div class="input-group">
+        <label>Base Network Par Transactions ki Sankhya</label>
+        <input type="number" id="inp-tx" placeholder="e.g. 50" min="0">
+      </div>
+
+      <div class="input-group">
+        <label>Active Months (Mahine)</label>
+        <input type="number" id="inp-months" placeholder="e.g. 6" min="0" max="24">
+      </div>
+
+      <!-- Sirf ek farcaster section -->
+      <div class="input-group">
+        <label>Farcaster Activity Level</label>
+        <select id="inp-farcaster">
+          <option value="0">Koi Farcaster Activity Nahi (0x multiplier)</option>
+          <option value="1">Basic User (1.5x multiplier)</option>
+          <option value="2">Active Caster (2.5x multiplier)</option>
+          <option value="3">Power User / OG (4x multiplier)</option>
+        </select>
+      </div>
+
+      <button class="btn-primary" onclick="calculateDrop()">Airdrop Calculate Karein</button>
+
+      <div id="result-area" class="result-box">
+        <div style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 1px;">Aapka Anumanit Airdrop</div>
+        <div class="token-amt" id="res-tokens">0 $BASE</div>
+        <div class="usd-val" id="res-usd">~$0.00 USD</div>
+
+        <!-- Naya AI Feature Button aur Box -->
+        <button id="btn-get-ai" class="btn-ai" onclick="getAIStrategy()">✨ AI se Strategy aur Sybil Analysis Puchiye</button>
+        <div id="ai-output" class="ai-response-box"></div>
+      </div>
+    </div>
+
+    <!-- Settings Pane -->
+    <div id="pane-settings" class="pane">
+      <div class="settings-grid">
+        
+        <div>
+          <h3 style="margin-bottom: 0.5rem; font-size: 1rem;">Anumanit FDV (Fully Diluted Valuation)</h3>
+          <p style="font-size: 0.8rem; color: var(--text-muted);">Token ki total market cap kya ho sakti hai.</p>
+          <div class="btn-group" id="fdv-btns">
+            <button class="sbtn" onclick="setFdv(2000000000, this)">$2B</button>
+            <button class="sbtn ab" onclick="setFdv(5000000000, this)">$5B</button>
+            <button class="sbtn" onclick="setFdv(10000000000, this)">$10B</button>
+            <button class="sbtn" onclick="setFdv(20000000000, this)">$20B</button>
+          </div>
+        </div>
+
+        <div>
+          <h3 style="margin-bottom: 0.5rem; font-size: 1rem;">Community Airdrop %</h3>
+          <p style="font-size: 0.8rem; color: var(--text-muted);">Total supply me se kitna % airdrop hoga.</p>
+          <div class="btn-group" id="air-btns">
+            <button class="sbtn" onclick="setAir(5, this)">5%</button>
+            <button class="sbtn at" onclick="setAir(10, this)">10%</button>
+            <button class="sbtn" onclick="setAir(15, this)">15%</button>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="chart-container">
+        <canvas id="allocChart"></canvas>
+      </div>
+    </div>
+
   </div>
-</div>
 
-<script>
-// === NFT MINT FUNCTION ===
-async function mintScoreAsNFT() {
-  if (!window.ethereum) return alert("MetaMask install karo!");
+  <script>
+    // State Variables
+    let ST = {
+      fdv: 5000000000, // Default $5B
+      airPct: 10,      // Default 10%
+      totalSupply: 10000000000, // 10 Billion fixed mock supply
+      lastTokens: 0
+    };
 
-  try {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    await provider.send("eth_requestAccounts", []);
-    const signer = provider.getSigner();
-    const user = await signer.getAddress();
+    let myChart = null;
 
-    const contractAddr = "0x05f68B8741b56508dBc696272BAd25D7cA0F8665";
-    const abi = ["function mint(address to) payable"];
+    // Tab Switch Logic
+    function tabSwitch(name, btn) {
+      document.querySelectorAll('.pane').forEach(p => p.classList.remove('on'));
+      document.querySelectorAll('.tab').forEach(b => b.classList.remove('on'));
+      
+      document.getElementById('pane-' + name).classList.add('on');
+      btn.classList.add('on');
 
-    const contract = new ethers.Contract(contractAddr, abi, signer);
+      // Agar settings tab open ho toh chart render karo
+      if(name === 'settings') {
+        setTimeout(renderAllocChart, 100);
+      }
+    }
 
-    const tx = await contract.mint(user, {
-      value: ethers.utils.parseEther("0.00033")
-    });
+    // Settings Update Logic
+    function setFdv(val, btn) {
+      ST.fdv = val;
+      document.querySelectorAll('#fdv-btns .sbtn').forEach(b => b.classList.remove('ab'));
+      btn.classList.add('ab');
+      updateUsdValue();
+    }
 
-    alert("⏳ Minting chal rahi hai...\nTx: " + tx.hash);
+    function setAir(val, btn) {
+      ST.airPct = val;
+      document.querySelectorAll('#air-btns .sbtn').forEach(b => b.classList.remove('at'));
+      btn.classList.add('at');
+      updateUsdValue();
+      if (document.getElementById('pane-settings').classList.contains('on')) {
+        renderAllocChart();
+      }
+    }
 
-    await tx.wait();
-    alert("✅ NFT Mint successful!\nRevenue tere wallet mein aa gaya!");
+    // Calculation Logic (Mock Formula without Contracts)
+    function calculateDrop() {
+      const bridgeVol = parseFloat(document.getElementById('inp-bridge').value) || 0;
+      const txCount = parseInt(document.getElementById('inp-tx').value) || 0;
+      const months = parseInt(document.getElementById('inp-months').value) || 0;
+      const farcasterMultiplier = parseFloat(document.getElementById('inp-farcaster').value) || 0;
 
-  } catch (e) {
-    if (e.code === 4001) alert("Transaction cancel kiya");
-    else alert("Error: " + e.message);
-  }
-}
+      // Base points calculation
+      let points = 0;
+      
+      if(bridgeVol > 0.1) points += 500;
+      if(bridgeVol > 1) points += 1500;
+      if(bridgeVol > 10) points += 5000;
 
-// === CAST FUNCTION (screenshot without button) ===
-async function castToFarcaster() {
-  const scoreArea = document.querySelector('.score-block');
-  if (!scoreArea) return alert("Pehle score tab kholo!");
+      if(txCount > 10) points += 300;
+      if(txCount > 50) points += 1000;
+      if(txCount > 100) points += 2500;
 
-  try {
-    const canvas = await html2canvas(scoreArea, {scale: 2, backgroundColor: '#06080f'});
-    const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+      points += (months * 150); // 150 points per active month
 
-    const form = new FormData();
-    form.append('file', blob, 'score.png');
+      // Farcaster multiplier apply karna (Sirf ek Farcaster check hai)
+      let multiplier = 1;
+      if(farcasterMultiplier === 1) multiplier = 1.5;
+      else if(farcasterMultiplier === 2) multiplier = 2.5;
+      else if(farcasterMultiplier === 3) multiplier = 4;
 
-    const res = await fetch('https://0x0.st', {method: 'POST', body: form});
-    const imgUrl = (await res.text()).trim();
+      const totalTokens = Math.floor(points * multiplier);
+      ST.lastTokens = totalTokens;
 
-    const tokens = document.getElementById('m-tok').innerText || '—';
-    const tier = document.getElementById('m-tier').innerText || '—';
-    const usd = document.getElementById('m-usd').innerText || '—';
+      // Display result
+      document.getElementById('res-tokens').innerText = totalTokens.toLocaleString() + ' $BASE';
+      document.getElementById('result-area').classList.add('show');
+      
+      // AI Button ko dikhayein aur purana AI result clear karein
+      document.getElementById('btn-get-ai').style.display = 'block';
+      document.getElementById('ai-output').style.display = 'none';
+      document.getElementById('ai-output').innerHTML = '';
+      
+      updateUsdValue();
+    }
 
-    const text = encodeURIComponent(
-      `🔥 Base Airdrop Simulator mein mera score: ${tokens} BASE (${tier} tier) ≈ ${usd}!\n\n` +
-      `Tumhara kitna aayega? Check karo 👇\n\n` +
-      `Made by @8q • Base Airdrop Farmer\n` +
-      `https://prakash26005.github.io/base-airdrop-simulator/\n\n` +
-      imgUrl
-    );
+    // USD Value update
+    function updateUsdValue() {
+      if(ST.lastTokens === 0) return;
+      
+      // Token price = FDV / Total Supply
+      const tokenPrice = ST.fdv / ST.totalSupply;
+      const usdValue = ST.lastTokens * tokenPrice;
 
-    window.open(`https://warpcast.com/~/compose?text=${text}`, '_blank');
-  } catch (e) {
-    alert("Screenshot error, manual attach kar sakte ho.");
-  }
-}
+      document.getElementById('res-usd').innerText = '~$' + usdValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' USD';
+    }
 
-// Rest of the script (same as before - run(), renderAll(), etc.)
-// ... (pura purana script yahan paste kar sakte ho, main sirf naye functions add kiye hain)
+    // Chart.js render function
+    function renderAllocChart() {
+      const ctx = document.getElementById('allocChart').getContext('2d');
+      
+      if(myChart) myChart.destroy();
 
-</script>
+      const airDropTokens = (ST.totalSupply * ST.airPct) / 100;
+      const remainingTokens = ST.totalSupply - airDropTokens;
+
+      myChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Airdrop (Community)', 'Core Contributors & Investors'],
+          datasets: [{
+            data: [airDropTokens, remainingTokens],
+            backgroundColor: [
+              '#0052FF',
+              '#1E293B'
+            ],
+            borderWidth: 0,
+            hoverOffset: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                color: '#8A93A6',
+                font: { family: "'Inter', sans-serif" }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Naya Gemini API Integration Logic
+    const apiKey = ""; // API key system automatically provide karega
+    
+    // Exponential backoff ke sath fetch function
+    async function fetchGeminiWithBackoff(prompt, maxRetries = 5) {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+      const payload = {
+        contents: [{ parts: [{ text: prompt }] }],
+        systemInstruction: { 
+          parts: [{ 
+            text: "Aap ek expert crypto airdrop analyst aur degen ho. User ko uski on-chain profile ke mutabiq feedback dena hai. Aapka jawab strictly Hinglish (Hindi words written in English alphabet) mein hona chahiye. Thoda mazedar, roast karne wala aur sarcastic tone rakhein (jaise Crypto Twitter par hota hai). Bullet points ka use karein. User ko batayein ki kya uski profile ek 'Sybil' (airdrop farmer/bot) lag rahi hai ya asli organic user, aur usko apna airdrop amount bada karne ke liye kya steps lene chahiye." 
+          }] 
+        }
+      };
+
+      let delay = 1000;
+      for (let i = 0; i < maxRetries; i++) {
+        try {
+          const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          if (!response.ok) throw new Error('API Error');
+          const data = await response.json();
+          return data.candidates?.[0]?.content?.parts?.[0]?.text || "Maaf karna, AI kuch error de raha hai.";
+        } catch (error) {
+          if (i === maxRetries - 1) return "Network me dikkat aayi hai ya API rate limit ho gaya hai. Kripya thodi der baad try karein.";
+          await new Promise(resolve => setTimeout(resolve, delay));
+          delay *= 2; // Exponential backoff: 1s, 2s, 4s, 8s, 16s
+        }
+      }
+    }
+
+    // AI strategy button ka function
+    async function getAIStrategy() {
+      const btn = document.getElementById('btn-get-ai');
+      const outBox = document.getElementById('ai-output');
+      
+      const bridgeVol = document.getElementById('inp-bridge').value || 0;
+      const txCount = document.getElementById('inp-tx').value || 0;
+      const months = document.getElementById('inp-months').value || 0;
+      const farcasterIdx = document.getElementById('inp-farcaster').selectedIndex;
+      const farcasterText = document.getElementById('inp-farcaster').options[farcasterIdx].text;
+      const estimatedTokens = ST.lastTokens;
+
+      // Loading State shuru karein
+      btn.innerHTML = '<span class="loader"></span> ✨ AI Soch Raha Hai...';
+      btn.disabled = true;
+      outBox.style.display = 'none';
+
+      const prompt = `User ka Base network ka data ye hai:
+      - Total Bridge Volume: ${bridgeVol} ETH
+      - Total Transactions: ${txCount}
+      - Active Months: ${months} mahine
+      - Farcaster Activity Level: ${farcasterText}
+      - Mera System ne unka Estimated Tokens itna calculate kiya hai: ${estimatedTokens} $BASE
+      
+      Is data ke aadhar par user ki on-chain aukaat (profile) ka analysis karo, strategy do aur Sybil bot check karo.`;
+
+      // API Call
+      const aiResponse = await fetchGeminiWithBackoff(prompt);
+
+      // Markdown format (asterisks) ko thoda HTML bold/italic mein convert kar dete hain
+      let formattedResponse = aiResponse
+        .replace(/\*\*(.*?)\*\*/g, '<b style="color:#fff;">$1</b>')
+        .replace(/\*(.*?)\*/g, '<i>$1</i>')
+        .replace(/\n/g, '<br>');
+
+      // Result screen par dikhayein
+      outBox.innerHTML = formattedResponse;
+      outBox.style.display = 'block';
+
+      // Button ko wapis normal karein
+      btn.innerHTML = '✨ AI se Strategy aur Sybil Analysis Puchiye';
+      btn.disabled = false;
+    }
+  </script>
 </body>
 </html>
